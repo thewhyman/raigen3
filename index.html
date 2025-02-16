@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facial Expression Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        #video {
+            border: 1px solid black;
+            width: 640px;
+            height: 480px;
+        }
+        .button {
+            margin-top: 20px;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Facial Expression Detection</h1>
+    <video id="video" autoplay></video>
+    <button class="button" id="start">Start Detection</button>
+    <p id="expressionMessage"></p>
+    <p id="meditationRecommendation"></p>
+
+    <script>
+        const video = document.getElementById('video');
+        const startButton = document.getElementById('start');
+        const expressionMessage = document.getElementById('expressionMessage');
+        const meditationRecommendation = document.getElementById('meditationRecommendation');
+
+        startButton.addEventListener('click', function() {
+            // Start video stream
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                    // Here we would connect to Gemini Vision AI to analyze the video
+                    detectExpression();
+                })
+                .catch(err => console.error("Error accessing webcam: ", err));
+        });
+
+        function detectExpression() {
+            // Mock function to simulate facial expression detection
+            // In a real application, you'd call Gemini Vision AI API here
+            setTimeout(() => {
+                const expressions = ["Happy", "Sad", "Angry", "Surprised", "Neutral"];
+                const randomExpression = expressions[Math.floor(Math.random() * expressions.length)];
+                expressionMessage.innerText = `Detected Expression: ${randomExpression}`;
+                askUser(randomExpression);
+            }, 3000); // Simulates delay for detection
+        }
+
+        function askUser(expression) {
+            const userFeeling = confirm(`Are you feeling ${expression}?`);
+            if (userFeeling) {
+                recommendMeditation(expression);
+            } else {
+                meditationRecommendation.innerText = "Let us know how you are feeling!";
+            }
+        }
+
+        function recommendMeditation(emotion) {
+            const recommendations = {
+                Happy: "Great! Keep that energy up with some joyful music meditation.",
+                Sad: "Try a guided meditation focusing on gratitude.",
+                Angry: "Consider deep breathing exercises to calm your mind.",
+                Surprised: "Take a moment to process your feelings and meditate on clarity.",
+                Neutral: "A mindfulness meditation can help in finding focus."
+            };
+            meditationRecommendation.innerText = recommendations[emotion];
+        }
+    </script>
+</body>
+</html>

@@ -3,81 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facial Expression Detection - Raigen3</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Raigen3 - Emotional Wellness</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 15px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            text-decoration: none;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .description {
+            color: #666;
+            margin: 0.5rem 0 2rem 0;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+    </style>
 </head>
 <body>
-    <h1>Facial Expression Detection</h1>
-    <video id="video" autoplay></video>
-    <button id="start">Start Detection</button>
-    <p id="expressionMessage"></p>
-    <p id="meditationRecommendation"></p>
-    <div id="moodResponseContainer" style="display: none;">
-        <p>How are you feeling?</p>
-        <button onclick="userFeeling('Yes')">Yes</button>
-        <button onclick="userFeeling('No')">No</button>
+    <div class="container">
+        <h1>Welcome to Raigen3</h1>
+        <p class="description">Your personal emotional wellness companion. Choose how you'd like to proceed:</p>
+        
+        <div class="button-container">
+            <a href="/autodetect.html" class="button">
+                Auto Detect Emotions
+            </a>
+            <a href="/avatar.html" class="button">
+                Talk to Therapist
+            </a>
+        </div>
     </div>
-
-    <script>
-        const video = document.getElementById('video');
-        const startButton = document.getElementById('start');
-        const expressionMessage = document.getElementById('expressionMessage');
-        const meditationRecommendation = document.getElementById('meditationRecommendation');
-        const moodResponseContainer = document.getElementById('moodResponseContainer');
-
-        startButton.addEventListener('click', function() {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => {
-                    video.srcObject = stream;
-                    detectExpression();
-                })
-                .catch(err => console.error("Error accessing webcam: ", err));
-        });
-
-        function detectExpression() {
-            setTimeout(() => {
-                const expressions = ["Happy", "Sad", "Angry", "Surprised", "Neutral"];
-                const randomExpression = expressions[Math.floor(Math.random() * expressions.length)];
-                expressionMessage.innerText = `Detected Expression: ${randomExpression}`;
-                
-                // Announce the mood using voice
-                speakExpression(randomExpression);
-                
-                askUser(randomExpression);
-            }, 3000); // Simulated delay for detection
-        }
-
-        function speakExpression(expression) {
-            const utterance = new SpeechSynthesisUtterance(`You seem to be feeling ${expression}`);
-            window.speechSynthesis.speak(utterance);
-        }
-
-        function askUser(expression) {
-            // Display the mood response options
-            moodResponseContainer.style.display = 'block';
-            expressionMessage.innerText = `Detected Expression: ${expression}. How are you feeling?`;
-        }
-
-        function userFeeling(response) {
-            const lastExpression = expressionMessage.innerText.match(/feeling (\w+)/)[1]; // Extract the detected mood
-            if (response === 'Yes') {
-                recommendMeditation(lastExpression);
-            } else {
-                meditationRecommendation.innerText = "Let us know how you are feeling!";
-            }
-            moodResponseContainer.style.display = 'none'; // Hide the mood response options
-        }
-
-        function recommendMeditation(emotion) {
-            const recommendations = {
-                Happy: "Great! Keep that energy up with some joyful music meditation.",
-                Sad: "Try a guided meditation focusing on gratitude.",
-                Angry: "Consider deep breathing exercises to calm your mind.",
-                Surprised: "Take a moment to process your feelings and meditate on clarity.",
-                Neutral: "A mindfulness meditation can help in finding focus."
-            };
-            meditationRecommendation.innerText = recommendations[emotion];
-        }
-    </script>
 </body>
 </html>

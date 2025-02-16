@@ -5,12 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Facial Expression Detection - Raigen3</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .emotion-emoji {
+            font-size: 24px;
+            cursor: pointer;
+            margin: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>Facial Expression Detection</h1>
     <video id="video" autoplay></video>
     <button id="start">Start Detection</button>
     <p id="expressionMessage"></p>
+    <p id="howAreYouFeelingQuestion">How are you feeling?</p>
+    <div id="emotionEmojis">
+        <span class="emotion-emoji" onclick="selectEmotion('Happy')">😀</span>
+        <span class="emotion-emoji" onclick="selectEmotion('Sad')">😢</span>
+        <span class="emotion-emoji" onclick="selectEmotion('Angry')">😠</span>
+        <span class="emotion-emoji" onclick="selectEmotion('Surprised')">😲</span>
+        <span class="emotion-emoji" onclick="selectEmotion('Neutral')">😐</span>
+    </div>
     <p id="meditationRecommendation"></p>
     <div id="moodResponseContainer" style="display: none;">
         <p id="userFeelingQuestion"></p>
@@ -26,6 +41,7 @@
         const video = document.getElementById('video');
         const startButton = document.getElementById('start');
         const expressionMessage = document.getElementById('expressionMessage');
+        const howAreYouFeelingQuestion = document.getElementById('howAreYouFeelingQuestion');
         const meditationRecommendation = document.getElementById('meditationRecommendation');
         const moodResponseContainer = document.getElementById('moodResponseContainer');
         const userFeelingQuestion = document.getElementById('userFeelingQuestion');
@@ -33,13 +49,24 @@
         const suggestionMessage = document.getElementById('suggestionMessage');
         const meditationVideo = document.getElementById('meditationVideo');
 
+        let isDetecting = false; // Flag to prevent multiple detections
+
+        // Initially display the question
+        howAreYouFeelingQuestion.innerText = "How are you feeling?";
+
         startButton.addEventListener('click', function() {
+            if (isDetecting) return; // Prevent multiple clicks
+            isDetecting = true; // Set flag to indicate detection is in progress
+
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
                     video.srcObject = stream;
                     detectExpression();
                 })
-                .catch(err => console.error("Error accessing webcam: ", err));
+                .catch(err => {
+                    console.error("Error accessing webcam: ", err);
+                    isDetecting = false; // Reset flag on error
+                });
         });
 
         function detectExpression() {
@@ -52,6 +79,7 @@
                 askUserWithVoice(randomExpression);
                 
                 askUser(randomExpression);
+                isDetecting = false; // Reset flag after detection is complete
             }, 3000); // Simulated delay for detection
         }
 
@@ -75,9 +103,21 @@
             moodResponseContainer.style.display = 'none'; // Hide the mood response options
         }
 
+        function selectEmotion(emotion) {
+            expressionMessage.innerText = `You selected: ${emotion}`;
+            // Optionally trigger further actions based on selected emotion
+            askUser(emotion);
+        }
+
         function suggestMeditationVideo(emotion) {
-            suggestionMessage.innerText = `I recommend you try this meditation for the detected emotion: ${emotion}.`;
+            const recommendationText = `I recommend you try this specialized meditation for the emotion: ${emotion}.`;
+            suggestionMessage.innerText = recommendationText;
             meditationVideo.src = "https://www.youtube.com/embed/F7PxEy5IyV4"; // Embed the video link
+            
+            // Speak the recommendation
+            const utterance = new SpeechSynthesisUtterance(recommendationText);
+            window.speechSynthesis.speak(utterance);
+            
             youtubeVideoContainer.style.display = 'block'; // Show the video suggestion
         }
 

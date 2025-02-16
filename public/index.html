@@ -3,28 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facial Expression Detection</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px;
-        }
-        #video {
-            border: 1px solid black;
-            width: 640px;
-            height: 480px;
-        }
-        .button {
-            margin-top: 20px;
-            padding: 10px 20px;
-        }
-    </style>
+    <title>Facial Expression Detection - Raigen3</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Facial Expression Detection</h1>
     <video id="video" autoplay></video>
-    <button class="button" id="start">Start Detection</button>
+    <button id="start">Start Detection</button>
     <p id="expressionMessage"></p>
     <p id="meditationRecommendation"></p>
 
@@ -35,25 +20,21 @@
         const meditationRecommendation = document.getElementById('meditationRecommendation');
 
         startButton.addEventListener('click', function() {
-            // Start video stream
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
                     video.srcObject = stream;
-                    // Here we would connect to Gemini Vision AI to analyze the video
                     detectExpression();
                 })
                 .catch(err => console.error("Error accessing webcam: ", err));
         });
 
         function detectExpression() {
-            // Mock function to simulate facial expression detection
-            // In a real application, you'd call Gemini Vision AI API here
             setTimeout(() => {
                 const expressions = ["Happy", "Sad", "Angry", "Surprised", "Neutral"];
                 const randomExpression = expressions[Math.floor(Math.random() * expressions.length)];
                 expressionMessage.innerText = `Detected Expression: ${randomExpression}`;
                 askUser(randomExpression);
-            }, 3000); // Simulates delay for detection
+            }, 3000); // Simulated delay for detection
         }
 
         function askUser(expression) {

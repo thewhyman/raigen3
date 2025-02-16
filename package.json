@@ -1,0 +1,24 @@
+{
+  "name": "raigen3",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thewhyman/raigen3.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thewhyman/raigen3/issues"
+  },
+  "homepage": "https://github.com/thewhyman/raigen3#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "description": ""
+}

@@ -7,16 +7,22 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .emotion-emoji {
-            font-size: 24px;
+            font-size: 40px; /* Increased emoji size */
             cursor: pointer;
             margin: 10px;
+        }
+
+        #howAreYouFeelingQuestion {
+            font-size: 24px; /* Increased question text size */
+            font-weight: bold; /* Made the text bold */
+            margin-bottom: 20px; /* Add space below the question */
         }
     </style>
 </head>
 <body>
     <h1>Facial Expression Detection</h1>
     <video id="video" autoplay></video>
-    <button id="start">Start Detection</button>
+    <button id="start">Auto-detect my emotion</button>
     <p id="expressionMessage"></p>
     <p id="howAreYouFeelingQuestion">How are you feeling?</p>
     <div id="emotionEmojis">
@@ -51,6 +57,15 @@
 
         let isDetecting = false; // Flag to prevent multiple detections
 
+        // Mapping of emotions to emojis
+        const emotionEmojisMap = {
+            Happy: '😀',
+            Sad: '😢',
+            Angry: '😠',
+            Surprised: '😲',
+            Neutral: '😐'
+        };
+
         // Initially display the question
         howAreYouFeelingQuestion.innerText = "How are you feeling?";
 
@@ -73,7 +88,9 @@
             setTimeout(() => {
                 const expressions = ["Happy", "Sad", "Angry", "Surprised", "Neutral"];
                 const randomExpression = expressions[Math.floor(Math.random() * expressions.length)];
-                expressionMessage.innerText = `Detected Expression: ${randomExpression}`;
+                const detectedEmoji = emotionEmojisMap[randomExpression]; // Get the corresponding emoji
+
+                expressionMessage.innerHTML = `Detected Expression: ${randomExpression} ${detectedEmoji}`; // Display emotion with emoji
                 
                 // Announce the mood using voice
                 askUserWithVoice(randomExpression);

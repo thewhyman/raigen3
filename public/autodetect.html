@@ -13,9 +13,13 @@
     <p id="expressionMessage"></p>
     <p id="meditationRecommendation"></p>
     <div id="moodResponseContainer" style="display: none;">
-        <p>How are you feeling?</p>
+        <p id="userFeelingQuestion"></p>
         <button onclick="userFeeling('Yes')">Yes</button>
         <button onclick="userFeeling('No')">No</button>
+    </div>
+    <div id="youtubeVideoContainer" style="display: none;">
+        <p id="suggestionMessage"></p>
+        <iframe id="meditationVideo" width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>
     </div>
 
     <script>
@@ -24,6 +28,10 @@
         const expressionMessage = document.getElementById('expressionMessage');
         const meditationRecommendation = document.getElementById('meditationRecommendation');
         const moodResponseContainer = document.getElementById('moodResponseContainer');
+        const userFeelingQuestion = document.getElementById('userFeelingQuestion');
+        const youtubeVideoContainer = document.getElementById('youtubeVideoContainer');
+        const suggestionMessage = document.getElementById('suggestionMessage');
+        const meditationVideo = document.getElementById('meditationVideo');
 
         startButton.addEventListener('click', function() {
             navigator.mediaDevices.getUserMedia({ video: true })
@@ -41,31 +49,48 @@
                 expressionMessage.innerText = `Detected Expression: ${randomExpression}`;
                 
                 // Announce the mood using voice
-                speakExpression(randomExpression);
+                askUserWithVoice(randomExpression);
                 
                 askUser(randomExpression);
             }, 3000); // Simulated delay for detection
         }
 
-        function speakExpression(expression) {
-            const utterance = new SpeechSynthesisUtterance(`You seem to be feeling ${expression}`);
+        function askUserWithVoice(expression) {
+            const utterance = new SpeechSynthesisUtterance(`Are you feeling ${expression}?`);
             window.speechSynthesis.speak(utterance);
         }
 
         function askUser(expression) {
-            // Display the mood response options
             moodResponseContainer.style.display = 'block';
-            expressionMessage.innerText = `Detected Expression: ${expression}. How are you feeling?`;
+            userFeelingQuestion.innerText = `Are you feeling ${expression}?`;
         }
 
         function userFeeling(response) {
-            const lastExpression = expressionMessage.innerText.match(/feeling (\w+)/)[1]; // Extract the detected mood
+            const lastExpression = expressionMessage.innerText.match(/Detected Expression: (\w+)/)[1]; // Extract the detected mood
             if (response === 'Yes') {
-                recommendMeditation(lastExpression);
+                suggestMeditationVideo(lastExpression);
             } else {
-                meditationRecommendation.innerText = "Let us know how you are feeling!";
+                captureNewEmotion();
             }
             moodResponseContainer.style.display = 'none'; // Hide the mood response options
+        }
+
+        function suggestMeditationVideo(emotion) {
+            suggestionMessage.innerText = `I recommend you try this meditation for the detected emotion: ${emotion}.`;
+            meditationVideo.src = "https://www.youtube.com/embed/F7PxEy5IyV4"; // Embed the video link
+            youtubeVideoContainer.style.display = 'block'; // Show the video suggestion
+        }
+
+        function captureNewEmotion() {
+            const newEmotion = prompt("Please enter your current emotion:");
+            if (newEmotion) {
+                expressNewEmotion(newEmotion);
+            }
+        }
+
+        function expressNewEmotion(emotion) {
+            expressionMessage.innerText = `You expressed that you are feeling: ${emotion}`;
+            meditationRecommendation.innerText = "Thank you for sharing your feelings!";
         }
 
         function recommendMeditation(emotion) {

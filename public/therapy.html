@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAI - Interactive Therapy Session</title>
+    
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#6B4E71">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Raigen3">
+    <link rel="apple-touch-icon" href="/images/icon-192x192.png">
+    <meta name="description" content="Interactive RAI Therapy Session with Emotion Detection">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/icon-192x192.png">
+    <link href="/css/output.css" rel="stylesheet">
+    
+    <!-- HeyGen Avatar Styles -->
+    <style>
+        .main-container {
+            display: grid;
+            gap: 2rem;
+            width: 100%;
+            max-width: 100vw;
+            padding: 1rem;
+        }
+
+        @media (min-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 2px solid #6B4E71;
+            padding: 1.5rem;
+            height: calc(100vh - 8rem);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-container {
+            flex: 1;
+            position: relative;
+            min-height: 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #heygen-streaming-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        #heygen-streaming-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .controls {
+            margin-top: 1rem;
+        }
+
+        .emotion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(107, 78, 113, 0.9);
+            color: white;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: rgba(107, 78, 113, 1);
+            transform: translateY(-1px);
+        }
+
+        .loading-dots::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-meditation bg-cover bg-center bg-no-repeat text-text antialiased">
+    <a href="/" class="fixed top-4 left-4 z-50 flex items-center gap-2 px-4 py-2 bg-primary/90 hover:bg-accent text-white rounded-lg shadow-lg transition-all duration-300 border border-white/20">
+        <span>🏠</span>
+        <span>Home</span>
+    </a>
+
+    <div class="main-container">
+        <!-- Emotion Detection Panel -->
+        <div class="panel">
+            <h2 class="text-2xl font-bold mb-4 text-center">Emotion Detection</h2>
+            <div class="video-container mb-4">
+                <video id="video" autoplay></video>
+            </div>
+            <div class="controls">
+                <button id="start" class="btn w-full justify-center mb-4">
+                    <span>🎯</span>
+                    <span>Auto-detect my emotion</span>
+                </button>
+                <p id="expressionMessage" class="text-lg text-center mb-4"></p>
+                <div id="moodResponseContainer" class="hidden space-y-4">
+                    <p id="userFeelingQuestion" class="text-lg text-center"></p>
+                    <div class="flex justify-center gap-4">
+                        <button onclick="userFeeling('Yes')" class="btn">
+                            <span>✅</span>
+                            <span>Yes</span>
+                        </button>
+                        <button onclick="userFeeling('No')" class="btn">
+                            <span>❌</span>
+                            <span>No</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="emotion-grid">
+                    <button class="btn" onclick="selectEmotion('Happy')"><span>😀</span><span>Happy</span></button>
+                    <button class="btn" onclick="selectEmotion('Sad')"><span>😢</span><span>Sad</span></button>
+                    <button class="btn" onclick="selectEmotion('Angry')"><span>😠</span><span>Angry</span></button>
+                    <button class="btn" onclick="selectEmotion('Surprised')"><span>😲</span><span>Surprised</span></button>
+                    <button class="btn" onclick="selectEmotion('Neutral')"><span>😐</span><span>Neutral</span></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Avatar Panel -->
+        <div class="panel">
+            <h2 class="text-2xl font-bold mb-4 text-center">AI Therapist</h2>
+            <div id="heygen-streaming-container" class="flex-1"></div>
+        </div>
+    </div>
+
+    <!-- Meditation Video Container -->
+    <div id="youtubeVideoContainer" class="fixed bottom-4 right-4 w-96 hidden">
+        <p id="suggestionMessage" class="text-lg mb-2"></p>
+        <iframe id="meditationVideo" class="w-full aspect-video rounded-xl bg-black shadow-lg" src="" frameborder="0" allowfullscreen loading="lazy"></iframe>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Emotion Detection Logic
+        const elements = {
+            video: document.getElementById('video'),
+            startButton: document.getElementById('start'),
+            expressionMessage: document.getElementById('expressionMessage'),
+            moodResponseContainer: document.getElementById('moodResponseContainer'),
+            userFeelingQuestion: document.getElementById('userFeelingQuestion'),
+            youtubeVideoContainer: document.getElementById('youtubeVideoContainer'),
+            suggestionMessage: document.getElementById('suggestionMessage'),
+            meditationVideo: document.getElementById('meditationVideo')
+        };
+
+        const emotionEmojisMap = {
+            Happy: '😀',
+            Sad: '😢',
+            Angry: '😠',
+            Surprised: '😲',
+            Neutral: '😐'
+        };
+
+        let isDetecting = false;
+        let videoStream = null;
+
+        function stopVideoStream() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+                elements.video.srcObject = null;
+            }
+        }
+
+        elements.startButton.addEventListener('click', async function() {
+            if (isDetecting) return;
+            isDetecting = true;
+
+            try {
+                stopVideoStream();
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'user',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                });
+                videoStream = stream;
+                elements.video.srcObject = stream;
+                detectExpression();
+            } catch (err) {
+                console.error("Error accessing webcam: ", err);
+                isDetecting = false;
+                alert("Could not access webcam. Please check permissions.");
+            }
+        });
+
+        function detectExpression() {
+            elements.expressionMessage.innerHTML = 'Detecting expression... <span class="loading-dots"></span>';
+            
+            setTimeout(() => {
+                const expressions = ["Happy", "Sad", "Angry", "Surprised", "Neutral"];
+                const randomExpression = expressions[Math.floor(Math.random() * expressions.length)];
+                const detectedEmoji = emotionEmojisMap[randomExpression];
+
+                elements.expressionMessage.innerHTML = `Detected Expression: ${randomExpression} ${detectedEmoji}`;
+                askUserWithVoice(randomExpression);
+                askUser(randomExpression);
+                stopVideoStream();
+                isDetecting = false;
+            }, 3000);
+        }
+
+        function askUserWithVoice(expression) {
+            const utterance = new SpeechSynthesisUtterance(`Are you feeling ${expression}?`);
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function askUser(expression) {
+            elements.moodResponseContainer.classList.remove('hidden');
+            elements.userFeelingQuestion.innerText = `Are you feeling ${expression}?`;
+        }
+
+        function userFeeling(response) {
+            const lastExpression = elements.expressionMessage.innerText.match(/Detected Expression: (\w+)/)[1];
+            if (response === 'Yes') {
+                suggestMeditationVideo(lastExpression);
+            } else {
+                captureNewEmotion();
+            }
+            elements.moodResponseContainer.classList.add('hidden');
+        }
+
+        function selectEmotion(emotion) {
+            elements.expressionMessage.innerText = `You selected: ${emotion} ${emotionEmojisMap[emotion]}`;
+            suggestMeditationVideo(emotion);
+        }
+
+        function suggestMeditationVideo(emotion) {
+            const videos = {
+                Happy: "https://www.youtube.com/embed/ZToicYcHIOU",
+                Sad: "https://www.youtube.com/embed/acUZdGd_3Dg",
+                Angry: "https://www.youtube.com/embed/aEqlQvczMJQ",
+                Surprised: "https://www.youtube.com/embed/t1rRo6cgM_E",
+                Neutral: "https://www.youtube.com/embed/inpok4MKVLM"
+            };
+
+            elements.suggestionMessage.innerText = `Here's a meditation video for your ${emotion.toLowerCase()} mood:`;
+            elements.meditationVideo.src = videos[emotion];
+            elements.youtubeVideoContainer.classList.remove('hidden');
+        }
+
+        function captureNewEmotion() {
+            elements.expressionMessage.innerText = "Please select how you're feeling:";
+        }
+    </script>
+
+    <!-- HeyGen Avatar Integration -->
+    <script>
+        (function(window) {
+            const host = "https://labs.heygen.com";
+            const avatarConfig = {
+                quality: "high",
+                avatarName: "Ann_Therapist_public",
+                knowledgeBaseId: "b08f15208b214718a4c6d0fdd918c21",
+                username: "6179b791b92741bf83d6a21736c3676b"
+            };
+
+            const url = `${host}/guest/streaming-embed?share=eyJxdWFsaXR5IjoiaGlnaCIsImF2YXRhck5hbWUiOiJBbm5fVGhlcmFwaXN0X3B1YmxpYyIsInBy%0D%0AZXZpZXdJbWciOiJodHRwczovL2ZpbGVzMi5oZXlnZW4uYWkvYXZhdGFyL3YzLzc1ZTBhODdiN2Zk%0D%0AOTRmMDk4MWZmMzk4YjU5M2RkNDdmXzQ1NTcwL3ByZXZpZXdfdGFsa180LndlYnAiLCJuZWVkUmVt%0D%0Ab3ZlQmFja2dyb3VuZCI6ZmFsc2UsImtub3dsZWRnZUJhc2VJZCI6ImIwOGYxNTIwOGIyMTQ3MWM4%0D%0AYTRjNmQwZmRkOTE4YzIxIiwidXNlcm5hbWUiOiI2MTc5Yjc5MWI5Mjc0MWJmODNkNmEyMTczNmMz%0D%0ANjc2YiJ9&inIFrame=1`;
+
+            const iframe = document.createElement("iframe");
+            iframe.allowFullscreen = true;
+            iframe.title = "AI Therapist";
+            iframe.role = "dialog";
+            iframe.allow = "microphone";
+            iframe.src = url;
+
+            document.getElementById('heygen-streaming-container').appendChild(iframe);
+        })(globalThis);
+    </script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+            caches.keys().then(function(names) {
+                for (let name of names) caches.delete(name);
+            });
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

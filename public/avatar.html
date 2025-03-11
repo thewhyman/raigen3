@@ -21,17 +21,21 @@
         #heygen-streaming-embed {
             z-index: 9999;
             position: fixed;
-            left: 40px;
-            bottom: 40px;
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.12);
-            transition: all linear 0.1s;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 80vw;
+            max-width: 1200px;
+            height: 80vh;
+            border-radius: 12px;
+            border: 2px solid #6B4E71;
+            box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.2);
+            transition: all ease-in-out 0.3s;
             overflow: hidden;
             opacity: 0;
             visibility: hidden;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
         }
 
         #heygen-streaming-embed.show {
@@ -103,20 +107,12 @@
             const container = document.createElement("div");
             container.id = "heygen-streaming-container";
 
-            // Create responsive styles
-            const expandedStyle = clientWidth < 540 
-                ? "height: 266px; width: 96%; left: 50%; transform: translateX(-50%);"
-                : "height: 366px; width: calc(366px * 16 / 9);";
-
-            // Add dynamic style for expanded state
+            // Avatar is already maximized by default, no need for expanded styles
             const expandedStyleSheet = document.createElement("style");
             expandedStyleSheet.textContent = `
                 #heygen-streaming-embed.expand {
-                    ${expandedStyle}
-                    border: 2px solid #6B4E71;
-                    border-radius: 12px;
-                    box-shadow: 0 4px 20px rgba(107, 78, 113, 0.2);
-                    backdrop-filter: blur(10px);
+                    opacity: 1;
+                    visibility: visible;
                 }
             `;
             document.head.appendChild(expandedStyleSheet);
@@ -141,7 +137,8 @@
                 switch (event.data.action) {
                     case "init":
                         initial = true;
-                        wrapDiv.classList.toggle("show", initial);
+                        wrapDiv.classList.add("show");
+                        wrapDiv.classList.add("expand");
                         break;
                     case "show":
                         visible = true;

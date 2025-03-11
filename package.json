@@ -2,6 +2,9 @@
   "name": "raigen3",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
@@ -20,5 +23,5 @@
   "dependencies": {
     "express": "^4.21.2"
   },
-  "description": ""
+  "description": "Multimodal (Text, Audio, 3D) Agentic AI Therapist"
 }

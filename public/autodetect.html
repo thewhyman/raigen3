@@ -6,16 +6,105 @@
     <title>Facial Expression Detection - Raigen3</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        /* Optimized CSS with better performance */
+        :root {
+            --primary-color: #4CAF50;
+            --text-color: #333;
+            --bg-color: #f5f7fa;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-color);
+            background: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+
         .emotion-emoji {
-            font-size: 40px; /* Increased emoji size */
+            font-size: 40px;
             cursor: pointer;
             margin: 10px;
+            transition: transform 0.2s ease;
+            will-change: transform;
+        }
+
+        .emotion-emoji:hover {
+            transform: scale(1.1);
         }
 
         #howAreYouFeelingQuestion {
-            font-size: 24px; /* Increased question text size */
-            font-weight: bold; /* Made the text bold */
-            margin-bottom: 20px; /* Add space below the question */
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        #youtubeVideoContainer {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        #youtubeVideoContainer.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #meditationVideo {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background: #000;
+        }
+
+        #video {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background: #000;
+        }
+
+        .loading-dots::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+            display: inline-block;
+            width: 20px;
+            text-align: left;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background: #45a049;
         }
     </style>
 </head>
@@ -40,7 +129,7 @@
     </div>
     <div id="youtubeVideoContainer" style="display: none;">
         <p id="suggestionMessage"></p>
-        <iframe id="meditationVideo" width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>
+        <iframe id="meditationVideo" width="560" height="315" src="" frameborder="0" allowfullscreen loading="lazy"></iframe>
     </div>
 
     <script>
@@ -56,6 +145,21 @@
         const meditationVideo = document.getElementById('meditationVideo');
 
         let isDetecting = false; // Flag to prevent multiple detections
+        let videoStream = null; // Store video stream reference
+
+        // Cache DOM elements
+        const elements = {
+            video: document.getElementById('video'),
+            startButton: document.getElementById('start'),
+            expressionMessage: document.getElementById('expressionMessage'),
+            howAreYouFeelingQuestion: document.getElementById('howAreYouFeelingQuestion'),
+            meditationRecommendation: document.getElementById('meditationRecommendation'),
+            moodResponseContainer: document.getElementById('moodResponseContainer'),
+            userFeelingQuestion: document.getElementById('userFeelingQuestion'),
+            youtubeVideoContainer: document.getElementById('youtubeVideoContainer'),
+            suggestionMessage: document.getElementById('suggestionMessage'),
+            meditationVideo: document.getElementById('meditationVideo')
+        };
 
         // Mapping of emotions to emojis
         const emotionEmojisMap = {
@@ -69,35 +173,57 @@
         // Initially display the question
         howAreYouFeelingQuestion.innerText = "How are you feeling?";
 
-        startButton.addEventListener('click', function() {
+        // Clean up function to stop video stream
+        function stopVideoStream() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+                elements.video.srcObject = null;
+            }
+        }
+
+        elements.startButton.addEventListener('click', async function() {
             if (isDetecting) return; // Prevent multiple clicks
             isDetecting = true; // Set flag to indicate detection is in progress
 
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => {
-                    video.srcObject = stream;
-                    detectExpression();
-                })
-                .catch(err => {
-                    console.error("Error accessing webcam: ", err);
-                    isDetecting = false; // Reset flag on error
+            try {
+                stopVideoStream(); // Stop any existing stream
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'user',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
                 });
+                videoStream = stream;
+                elements.video.srcObject = stream;
+                detectExpression();
+            } catch (err) {
+                console.error("Error accessing webcam: ", err);
+                isDetecting = false;
+                alert("Could not access webcam. Please check permissions.");
+            }
         });
 
         function detectExpression() {
+            // Show loading state
+            elements.expressionMessage.innerHTML = 'Detecting expression... <span class="loading-dots"></span>';
+            
             setTimeout(() => {
                 const expressions = ["Happy", "Sad", "Angry", "Surprised", "Neutral"];
                 const randomExpression = expressions[Math.floor(Math.random() * expressions.length)];
-                const detectedEmoji = emotionEmojisMap[randomExpression]; // Get the corresponding emoji
+                const detectedEmoji = emotionEmojisMap[randomExpression];
 
-                expressionMessage.innerHTML = `Detected Expression: ${randomExpression} ${detectedEmoji}`; // Display emotion with emoji
+                elements.expressionMessage.innerHTML = `Detected Expression: ${randomExpression} ${detectedEmoji}`;
                 
                 // Announce the mood using voice
                 askUserWithVoice(randomExpression);
-                
                 askUser(randomExpression);
-                isDetecting = false; // Reset flag after detection is complete
-            }, 3000); // Simulated delay for detection
+                
+                // Clean up video stream after detection
+                stopVideoStream();
+                isDetecting = false;
+            }, 3000);
         }
 
         function askUserWithVoice(expression) {
@@ -127,15 +253,33 @@
         }
 
         function suggestMeditationVideo(emotion) {
-            const recommendationText = `I recommend you try this specialized meditation for the emotion: ${emotion}.`;
-            suggestionMessage.innerText = recommendationText;
-            meditationVideo.src = "https://www.youtube.com/embed/F7PxEy5IyV4"; // Embed the video link
+            const videoMap = {
+                Happy: 'inpok4MKVLM', // Meditation for Happiness
+                Sad: 'xRxT9cOKiM8',   // Meditation for Sadness
+                Angry: '5T7k5BxGg1s',  // Meditation for Anger
+                Surprised: 'W8fQPBo4NsY', // Meditation for Anxiety/Surprise
+                Neutral: 'O-6f5wQXSu8'   // General Mindfulness Meditation
+            };
+
+            const videoId = videoMap[emotion] || 'O-6f5wQXSu8';
+            const recommendationText = `I recommend this specialized meditation for when you're feeling ${emotion}:`;
             
-            // Speak the recommendation
+            elements.suggestionMessage.innerText = recommendationText;
+            
+            // Preload the video iframe
+            elements.meditationVideo.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+            
+            // Show video container with animation
+            elements.youtubeVideoContainer.style.display = 'block';
+            requestAnimationFrame(() => {
+                elements.youtubeVideoContainer.classList.add('visible');
+            });
+            
+            // Speak the recommendation with better voice settings
             const utterance = new SpeechSynthesisUtterance(recommendationText);
+            utterance.rate = 0.9; // Slightly slower for better clarity
+            utterance.pitch = 1.1; // Slightly higher pitch for engagement
             window.speechSynthesis.speak(utterance);
-            
-            youtubeVideoContainer.style.display = 'block'; // Show the video suggestion
         }
 
         function captureNewEmotion() {

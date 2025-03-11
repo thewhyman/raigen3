@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn {
+    @apply flex flex-col items-center justify-center text-center p-4 text-base text-white bg-primary/90 backdrop-blur-md rounded-2xl transition-all duration-300 cursor-pointer w-[180px] h-[180px] relative overflow-hidden hover:bg-accent hover:scale-105 hover:shadow-lg border-2 border-white/20 shadow-xl;
+  }
+  
+  .btn-emoji {
+    @apply text-4xl mb-2;
+  }
+  
+  .btn-text {
+    @apply mt-2.5 leading-relaxed;
+  }
+  
+  .container-glass {
+    @apply bg-container backdrop-blur-lg shadow-lg rounded-2xl border border-primary/10;
+  }
+}

@@ -5,23 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAI - HeyGen Avatar Demo</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#6B4E71">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Raigen3">
+    <link rel="apple-touch-icon" href="/images/icon-192x192.png">
+    <meta name="description" content="Interactive RAI Avatar - Your AI Therapist">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/icon-192x192.png">
+    <link href="/css/output.css" rel="stylesheet">
     
-    <!-- Custom Styles -->
+    <!-- HeyGen Avatar Styles -->
     <style>
-        /* Main container styles */
-        .avatar-container {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            aspect-ratio: 16/9;
-            background-color: #f0f0f0;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        /* HeyGen Avatar Styles */
         #heygen-streaming-embed {
             z-index: 9999;
             position: fixed;
@@ -56,21 +52,25 @@
     </style>
 </head>
 
-<body class="bg-gray-100 min-h-screen">
+<body class="min-h-screen flex flex-col items-center bg-meditation bg-cover bg-center bg-no-repeat text-text antialiased p-5">
+    <a href="/" class="fixed top-4 left-4 z-50 flex items-center gap-2 px-4 py-2 bg-primary/90 hover:bg-accent text-white rounded-lg shadow-lg transition-all duration-300 border border-white/20">
+        <span>🏠</span>
+        <span>Home</span>
+    </a>
     <!-- Main Content -->
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold text-center mb-8">Interactive RAI Avatar Demo</h1>
+    <div class="container-glass text-center p-8 max-w-4xl w-11/12 mb-8">
+        <h1 class="text-4xl font-bold mb-8 text-text">Interactive RAI Avatar Demo</h1>
         
         <!-- Instructions Card -->
-        <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        <div class="bg-container/50 backdrop-blur-sm rounded-xl shadow-lg p-6 mt-8">
             <div class="mb-8 text-center">
-                <p class="text-gray-600">This demo showcases an interactive AI avatar.</p>
+                <p class="text-lg text-text">This demo showcases an interactive AI avatar.</p>
             </div>
             
             <div class="space-y-4">
                 <div class="flex flex-col">
-                    <label class="text-lg font-medium text-gray-700 mb-2">Instructions:</label>
-                    <ol class="list-decimal list-inside space-y-2 text-gray-600">
+                    <label class="text-xl font-bold text-text mb-4">Instructions:</label>
+                    <ol class="list-decimal list-inside space-y-3 text-text">
                         <li>Wait for the avatar to appear in the bottom-left corner</li>
                         <li>Click on the avatar to expand it</li>
                         <li>Interact with the avatar through text or voice</li>
@@ -113,8 +113,10 @@
             expandedStyleSheet.textContent = `
                 #heygen-streaming-embed.expand {
                     ${expandedStyle}
-                    border: 0;
-                    border-radius: 8px;
+                    border: 2px solid #6B4E71;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 20px rgba(107, 78, 113, 0.2);
+                    backdrop-filter: blur(10px);
                 }
             `;
             document.head.appendChild(expandedStyleSheet);

@@ -7,7 +7,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "build:css": "tailwindcss -i ./public/css/styles.css -o ./public/css/output.css --watch"
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,10 @@
   "dependencies": {
     "express": "^4.21.2"
   },
-  "description": "Multimodal (Text, Audio, 3D) Agentic AI Therapist"
+  "description": "Multimodal (Text, Audio, 3D) Agentic AI Therapist",
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5"
+  }
 }

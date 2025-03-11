@@ -4,84 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raigen3 - Emotional Wellness</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
-        }
-
-        .container {
-            text-align: center;
-            padding: 2rem;
-            border-radius: 15px;
-            background-color: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 90%;
-        }
-
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 2rem;
-            font-size: 2.5rem;
-        }
-
-        .button-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .button {
-            display: inline-block;
-            padding: 1rem 2rem;
-            font-size: 1.2rem;
-            text-decoration: none;
-            color: white;
-            background-color: #4CAF50;
-            border: none;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .button:hover {
-            background-color: #45a049;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .description {
-            color: #666;
-            margin: 0.5rem 0 2rem 0;
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-    </style>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#6B4E71">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Raigen3">
+    <link rel="apple-touch-icon" href="/images/icon-192x192.png">
+    <meta name="description" content="Multimodal (Text, Audio, 3D) Agentic AI Therapist">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/icon-192x192.png">
+    <link href="/css/output.css" rel="stylesheet">
 </head>
-<body>
-    <div class="container">
-        <h1>Welcome to Resilience AI (Rai)</h1>
-        <p class="description">Multimoda (Text, Audio, 3D) Agentic AI Therapist</p>
+<body class="min-h-screen flex flex-col items-center justify-center bg-meditation bg-cover bg-center bg-no-repeat text-text">
+    <div class="container-glass text-center p-8 max-w-2xl w-11/12">
+        <h1 class="text-4xl font-bold mb-8 text-text">RAI (Resilience AI)</h1>
+        <h2 class="text-2xl font-semibold mb-8 text-gray-600">Multimodal (Text, Audio, 3D) Agentic AI Therapist</h2>
+        <p class="text-lg text-gray-600 mb-8 leading-relaxed">Build Resilience against Anxiety, Depression and Loneliness</p>
         
-        <div class="button-container">
-            <a href="/autodetect.html" class="button">
-                [Morning Routine] Auto Detect Emotions
+        <div class="flex flex-row justify-center gap-8 mt-8 md:flex-row flex-col items-center">
+            <a href="/autodetect.html" class="btn">
+                <span class="btn-emoji">🌅</span>
+                <span class="btn-text">Auto Detect Emotions</span>
             </a>
-            <a href="/avatar.html" class="button">
-                [Bedtime Routine] Gratitude Journaling with 3D Avatar
+            <a href="/avatar.html" class="btn">
+                <span class="btn-emoji">🌙</span>
+                <span class="btn-text">Gratitude Journaling</span>
             </a>
         </div>
     </div>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>

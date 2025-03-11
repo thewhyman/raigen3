@@ -3,133 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facial Expression Detection - Raigen3</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        /* Optimized CSS with better performance */
-        :root {
-            --primary-color: #4CAF50;
-            --text-color: #333;
-            --bg-color: #f5f7fa;
-        }
+    <title>Auto Detect Emotions - Raigen3</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#6B4E71">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Raigen3">
+    <link rel="apple-touch-icon" href="/images/icon-192x192.png">
+    <meta name="description" content="Auto detect emotions with Raigen3's AI therapist">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/icon-192x192.png">
+    <link href="/css/output.css" rel="stylesheet">
 
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: var(--text-color);
-            background: var(--bg-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            text-rendering: optimizeLegibility;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .emotion-emoji {
-            font-size: 40px;
-            cursor: pointer;
-            margin: 10px;
-            transition: transform 0.2s ease;
-            will-change: transform;
-        }
-
-        .emotion-emoji:hover {
-            transform: scale(1.1);
-        }
-
-        #howAreYouFeelingQuestion {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: var(--text-color);
-        }
-
-        #youtubeVideoContainer {
-            margin-top: 20px;
-            width: 100%;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-
-        #youtubeVideoContainer.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        #meditationVideo {
-            width: 100%;
-            aspect-ratio: 16/9;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            background: #000;
-        }
-
-        #video {
-            max-width: 100%;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            background: #000;
-        }
-
-        .loading-dots::after {
-            content: '...';
-            animation: dots 1.5s steps(4, end) infinite;
-            display: inline-block;
-            width: 20px;
-            text-align: left;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60% { content: '...'; }
-            80%, 100% { content: ''; }
-        }
-
-        button {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.2s ease;
-        }
-
-        button:hover {
-            background: #45a049;
-        }
-    </style>
 </head>
-<body>
-    <h1>Facial Expression Detection</h1>
-    <video id="video" autoplay></video>
-    <button id="start">Auto-detect my emotion</button>
-    <p id="expressionMessage"></p>
-    <p id="howAreYouFeelingQuestion">How are you feeling?</p>
-    <div id="emotionEmojis">
-        <span class="emotion-emoji" onclick="selectEmotion('Happy')">😀</span>
-        <span class="emotion-emoji" onclick="selectEmotion('Sad')">😢</span>
-        <span class="emotion-emoji" onclick="selectEmotion('Angry')">😠</span>
-        <span class="emotion-emoji" onclick="selectEmotion('Surprised')">😲</span>
-        <span class="emotion-emoji" onclick="selectEmotion('Neutral')">😐</span>
+<body class="min-h-screen flex flex-col items-center bg-meditation bg-cover bg-center bg-no-repeat text-text antialiased p-5">
+    <a href="/" class="fixed top-4 left-4 z-50 flex items-center gap-2 px-4 py-2 bg-primary/90 hover:bg-accent text-white rounded-lg shadow-lg transition-all duration-300 border border-white/20">
+        <span>🏠</span>
+        <span>Home</span>
+    </a>
+    <div class="container-glass text-center p-8 max-w-4xl w-11/12 mb-8">
+        <h1 class="text-4xl font-bold mb-8 text-text">Facial Expression Detection</h1>
+        <video id="video" class="w-full max-w-2xl rounded-xl mb-5 mx-auto bg-black shadow-lg" autoplay></video>
+        <button id="start" class="flex items-center gap-2 px-4 py-2 bg-primary/90 hover:bg-accent text-white rounded-lg shadow-lg transition-all duration-300 border border-white/20 mx-auto">
+            <span>🎯</span>
+            <span>Auto-detect my emotion</span>
+        </button>
+        <p id="expressionMessage" class="text-lg mt-4"></p>
+        
+        <div class="mt-8">
+            <p id="howAreYouFeelingQuestion" class="text-2xl font-bold mb-5 text-text">How are you feeling?</p>
+            <div id="emotionEmojis" class="flex flex-wrap justify-center gap-4 mb-6">
+                <button class="flex items-center gap-2 px-4 py-2 bg-primary/90 hover:bg-accent text-white rounded-lg shadow-lg transition-all duration-300 border border-white/20" onclick="selectEmotion('Happy')"><span>😀</span><span>Happy</span></button>
+                <button class="flex items-center gap-2 px-4 py-2 bg-primary/90 hover:bg-accent text-white rounded-lg shadow-lg transition-all duration-300 border border-white/20" onclick="selectEmotion('Sad')"><span>😢</span><span>Sad</span></button>
+                <button class="flex items-center gap-2 px-4 py-2 bg-primary/90 hover:bg-accent text-white rounded-lg shadow-lg transition-all duration-300 border border-white/20" onclick="selectEmotion('Angry')"><span>😠</span><span>Angry</span></button>
+                <button class="flex items-center gap-2 px-4 py-2 bg-primary/90 hover:bg-accent text-white rounded-lg shadow-lg transition-all duration-300 border border-white/20" onclick="selectEmotion('Surprised')"><span>😲</span><span>Surprised</span></button>
+                <button class="flex items-center gap-2 px-4 py-2 bg-primary/90 hover:bg-accent text-white rounded-lg shadow-lg transition-all duration-300 border border-white/20" onclick="selectEmotion('Neutral')"><span>😐</span><span>Neutral</span></button>
+            </div>
+        </div>
+        
+        <p id="meditationRecommendation" class="text-lg my-4"></p>
+        
+        <div id="moodResponseContainer" class="hidden space-y-4 mt-6">
+            <p id="userFeelingQuestion" class="text-lg"></p>
+            <div class="flex justify-center gap-4">
+                <button onclick="userFeeling('Yes')" class="flex items-center gap-2 px-4 py-2 bg-primary/90 hover:bg-accent text-white rounded-lg shadow-lg transition-all duration-300 border border-white/20">
+                    <span>✅</span>
+                    <span>Yes</span>
+                </button>
+                <button onclick="userFeeling('No')" class="flex items-center gap-2 px-4 py-2 bg-primary/90 hover:bg-accent text-white rounded-lg shadow-lg transition-all duration-300 border border-white/20">
+                    <span>❌</span>
+                    <span>No</span>
+                </button>
+            </div>
+        </div>
     </div>
-    <p id="meditationRecommendation"></p>
-    <div id="moodResponseContainer" style="display: none;">
-        <p id="userFeelingQuestion"></p>
-        <button onclick="userFeeling('Yes')">Yes</button>
-        <button onclick="userFeeling('No')">No</button>
-    </div>
-    <div id="youtubeVideoContainer" style="display: none;">
-        <p id="suggestionMessage"></p>
-        <iframe id="meditationVideo" width="560" height="315" src="" frameborder="0" allowfullscreen loading="lazy"></iframe>
+    
+    <div id="youtubeVideoContainer" class="container-glass hidden w-full max-w-4xl p-6 mt-8">
+        <p id="suggestionMessage" class="text-lg mb-4"></p>
+        <iframe id="meditationVideo" class="w-full aspect-video rounded-xl bg-black shadow-lg" src="" frameborder="0" allowfullscreen loading="lazy"></iframe>
     </div>
 
     <script>
@@ -232,7 +163,7 @@
         }
 
         function askUser(expression) {
-            moodResponseContainer.style.display = 'block';
+            moodResponseContainer.classList.remove('hidden');
             userFeelingQuestion.innerText = `Are you feeling ${expression}?`;
         }
 
@@ -243,7 +174,7 @@
             } else {
                 captureNewEmotion();
             }
-            moodResponseContainer.style.display = 'none'; // Hide the mood response options
+            moodResponseContainer.classList.add('hidden'); // Hide the mood response options
         }
 
         function selectEmotion(emotion) {
@@ -270,9 +201,9 @@
             elements.meditationVideo.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
             
             // Show video container with animation
-            elements.youtubeVideoContainer.style.display = 'block';
+            elements.youtubeVideoContainer.classList.remove('hidden');
             requestAnimationFrame(() => {
-                elements.youtubeVideoContainer.classList.add('visible');
+                elements.youtubeVideoContainer.classList.add('opacity-100', 'translate-y-0');
             });
             
             // Speak the recommendation with better voice settings
@@ -303,6 +234,19 @@
                 Neutral: "A mindfulness meditation can help in finding focus."
             };
             meditationRecommendation.innerText = recommendations[emotion];
+        }
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
         }
     </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAI - Interactive Therapy Session</title>
+    <title>RAI - Resilience AI Therapist</title>
     
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#6B4E71">
@@ -306,13 +306,17 @@
 <body class="min-h-screen bg-meditation bg-cover bg-center bg-no-repeat text-text antialiased">
 
     <div class="main-container">
+        <header class="mb-8 text-center">
+            <h1 class="font-bold mb-3" style="font-size: 2.5rem; text-shadow: 0 3px 6px rgba(0, 0, 0, 0.5); background: linear-gradient(135deg, #FF9D6C, #BB4E75, #6B4E71); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: 1px;">RAI - Resilience AI Therapist</h1>
+            <div class="w-32 h-1 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 mx-auto rounded-full"></div>
+        </header>
         <div class="tabs">
             <button class="tab active" onclick="switchTab('emotion')">
-                <span class="emoji">🎭</span>
+                <span class="emoji">☀️</span>
                 <span>Morning Check-In</span>
             </button>
             <button class="tab" onclick="switchTab('avatar')">
-                <span class="emoji">🧘‍♀️</span>
+                <span class="emoji">🌙</span>
                 <span>Bedtime Journaling<span>
             </button>
         </div>
@@ -325,7 +329,7 @@
             </div>
             <div class="controls" style="display: flex; flex-direction: column; align-items: center;">
                 <button id="start" class="btn btn-info py-2 mb-3" style="width: 200px; height: 40px; display: block; margin: 0 auto;">
-                    <span>🎯 Detect</span>
+                    <span>🎯 Detect My Mood</span>
                 </button>
                 <p id="expressionMessage" class="text-lg text-center mb-4"></p>
                 <div id="moodResponseContainer" class="hidden space-y-4">
@@ -340,11 +344,21 @@
                     </div>
                 </div>
                 <div class="emotion-grid" style="display: flex; gap: 15px; justify-content: center; margin: 20px 0;">
-                    <button class="btn btn-success" onclick="selectEmotion('Happy')" style="width: 50px; height: 50px; padding: 0; margin: 0 5px;"><span style="font-size: 1.25rem;">😀</span></button>
-                    <button class="btn btn-info" onclick="selectEmotion('Sad')" style="width: 50px; height: 50px; padding: 0; margin: 0 5px;"><span style="font-size: 1.25rem;">😢</span></button>
-                    <button class="btn btn-danger" onclick="selectEmotion('Angry')" style="width: 50px; height: 50px; padding: 0; margin: 0 5px;"><span style="font-size: 1.25rem;">😠</span></button>
-                    <button class="btn btn-warning" onclick="selectEmotion('Surprised')" style="width: 50px; height: 50px; padding: 0; margin: 0 5px;"><span style="font-size: 1.25rem;">😲</span></button>
-                    <button class="btn" onclick="selectEmotion('Neutral')" style="width: 50px; height: 50px; padding: 0; margin: 0 5px;"><span style="font-size: 1.25rem;">😐</span></button>
+                    <button class="btn" onclick="selectEmotion('Joy')" style="width: 60px; height: 60px; padding: 0; margin: 0 5px; background: transparent; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; overflow: hidden;">
+                        <img src="/images/insideout/Joy.png" alt="Joy" style="width: 100%; height: 100%; object-fit: cover;">
+                    </button>
+                    <button class="btn" onclick="selectEmotion('Sad')" style="width: 60px; height: 60px; padding: 0; margin: 0 5px; background: transparent; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; overflow: hidden;">
+                        <img src="/images/insideout/Sadness.png" alt="Sadness" style="width: 100%; height: 100%; object-fit: cover;">
+                    </button>
+                    <button class="btn" onclick="selectEmotion('Angry')" style="width: 60px; height: 60px; padding: 0; margin: 0 5px; background: transparent; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; overflow: hidden;">
+                        <img src="/images/insideout/Anger.png" alt="Anger" style="width: 100%; height: 100%; object-fit: cover;">
+                    </button>
+                    <button class="btn" onclick="selectEmotion('Disgusted')" style="width: 60px; height: 60px; padding: 0; margin: 0 5px; background: transparent; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; overflow: hidden;">
+                        <img src="/images/insideout/Disgust.png" alt="Disgust" style="width: 100%; height: 100%; object-fit: cover;">
+                    </button>
+                    <button class="btn" onclick="selectEmotion('Fear')" style="width: 60px; height: 60px; padding: 0; margin: 0 5px; background: transparent; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; overflow: hidden;">
+                        <img src="/images/insideout/Fear.png" alt="Fear" style="width: 100%; height: 100%; object-fit: cover;">
+                    </button>
                 </div>
             </div>
         </div>
@@ -399,12 +413,12 @@
             closeVideoBtn: document.getElementById('closeVideoBtn')
         };
 
-        const emotionEmojisMap = {
-            Happy: '😀',
-            Sad: '😢',
-            Angry: '😠',
-            Surprised: '😲',
-            Neutral: '😐'
+        const emotionImagesMap = {
+            Joy: '/images/insideout/Joy.png',
+            Sad: '/images/insideout/Sadness.png',
+            Angry: '/images/insideout/Anger.png',
+            Disgusted: '/images/insideout/Disgust.png',
+            Fear: '/images/insideout/Fear.png'
         };
 
         let isDetecting = false;
@@ -445,11 +459,12 @@
             elements.expressionMessage.innerHTML = 'Detecting expression... <span class="loading-dots"></span>';
             
             setTimeout(() => {
-                const expressions = ["Happy", "Sad", "Angry", "Surprised", "Neutral"];
+                const expressions = ["Joy", "Sad", "Angry", "Disgusted", "Fear"];
                 const randomExpression = expressions[Math.floor(Math.random() * expressions.length)];
-                const detectedEmoji = emotionEmojisMap[randomExpression];
+                const detectedImageSrc = emotionImagesMap[randomExpression];
 
-                elements.expressionMessage.innerHTML = `Detected Expression: ${randomExpression} ${detectedEmoji}`;
+                elements.expressionMessage.innerHTML = `Detected Expression: <img src="${detectedImageSrc}" alt="${randomExpression}" style="width: 40px; height: 40px; border-radius: 50%; vertical-align: middle;"> ${randomExpression}`;
+                lastDetectedEmotion = randomExpression;
                 askUserWithVoice(randomExpression);
                 askUser(randomExpression);
                 stopVideoStream();
@@ -475,10 +490,11 @@
             elements.userFeelingQuestion.innerText = `Are you feeling ${expression}?`;
         }
 
+        let lastDetectedEmotion = '';
+
         function userFeeling(response) {
-            const lastExpression = elements.expressionMessage.innerText.match(/Detected Expression: (\w+)/)[1];
             if (response === 'Yes') {
-                suggestMeditationVideo(lastExpression);
+                suggestMeditationVideo(lastDetectedEmotion);
             } else {
                 captureNewEmotion();
             }
@@ -486,17 +502,17 @@
         }
 
         function selectEmotion(emotion) {
-            elements.expressionMessage.innerText = `You selected: ${emotion} ${emotionEmojisMap[emotion]}`;
+            elements.expressionMessage.innerHTML = `You selected: <img src="${emotionImagesMap[emotion]}" alt="${emotion}" style="width: 40px; height: 40px; border-radius: 50%; vertical-align: middle;"> ${emotion}`;
             suggestMeditationVideo(emotion);
         }
 
         function suggestMeditationVideo(emotion) {
             const videos = {
-                Happy: "https://www.youtube.com/embed/ZToicYcHIOU?enablejsapi=1",
+                Joy: "https://www.youtube.com/embed/ZToicYcHIOU?enablejsapi=1",
                 Sad: "https://www.youtube.com/embed/acUZdGd_3Dg?enablejsapi=1",
                 Angry: "https://www.youtube.com/embed/aEqlQvczMJQ?enablejsapi=1",
-                Surprised: "https://www.youtube.com/embed/t1rRo6cgM_E?enablejsapi=1",
-                Neutral: "https://www.youtube.com/embed/inpok4MKVLM?enablejsapi=1"
+                Disgusted: "https://www.youtube.com/embed/t1rRo6cgM_E?enablejsapi=1",
+                Fear: "https://www.youtube.com/embed/inpok4MKVLM?enablejsapi=1"
             };
 
             // Announce the video (with voice)

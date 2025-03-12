@@ -20,14 +20,14 @@ app.use((req, res, next) => {
 
 // Default route with explicit file reading
 app.get('/', (req, res) => {
-    const indexPath = path.join(__dirname, 'public', 'index.html');
-    console.log('Serving index.html from:', indexPath);
+    const therapyPath = path.join(__dirname, 'public', 'therapy.html');
+    console.log('Serving therapy.html from:', therapyPath);
     
     // Read and serve the file directly
-    fs.readFile(indexPath, 'utf8', (err, content) => {
+    fs.readFile(therapyPath, 'utf8', (err, content) => {
         if (err) {
-            console.error('Error reading index.html:', err);
-            return res.status(500).send('Error reading index.html');
+            console.error('Error reading therapy.html:', err);
+            return res.status(500).send('Error reading therapy.html');
         }
         res.type('html').send(content);
     });
@@ -39,9 +39,9 @@ app.use(express.static(path.join(__dirname, 'public'), {
     lastModified: false
 }));
 
-// Autodetect route
-app.get('/autodetect', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'autodetect.html'));
+// Redirect any old routes to the main page
+app.get(['/autodetect', '/avatar', '/index'], (req, res) => {
+    res.redirect('/');
 });
 
 // Start the server

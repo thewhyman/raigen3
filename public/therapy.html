@@ -16,6 +16,9 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/images/icon-192x192.png">
     <link href="/css/output.css" rel="stylesheet">
     
+    <!-- Face-API.js for emotion detection -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    
     <!-- HeyGen Avatar Styles -->
     <style>
         .main-container {
@@ -455,9 +458,114 @@
             }
         });
 
-        function detectExpression() {
+        // Load Face-API.js models
+        async function loadModels() {
+            try {
+                await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+                await faceapi.nets.faceExpressionNet.loadFromUri('/models');
+                console.log('Face detection models loaded successfully');
+                return true;
+            } catch (error) {
+                console.error('Error loading face detection models:', error);
+                return false;
+            }
+        }
+
+        // Map Face-API expressions to our emotion categories
+        const expressionMapping = {
+            happy: 'Joy',
+            sad: 'Sad',
+            angry: 'Angry',
+            disgusted: 'Disgusted',
+            fearful: 'Fear',
+            surprised: 'Joy',
+            neutral: 'Joy'
+        };
+
+        let modelsLoaded = false;
+        let detectionInterval;
+
+        async function detectExpression() {
             elements.expressionMessage.innerHTML = 'Detecting expression... <span class="loading-dots"></span>';
             
+            // Load models if not already loaded
+            if (!modelsLoaded) {
+                modelsLoaded = await loadModels();
+                if (!modelsLoaded) {
+                    // Fallback to random if models failed to load
+                    fallbackRandomDetection();
+                    return;
+                }
+            }
+            
+            // Set up detection interval
+            let detectionCount = 0;
+            const maxDetections = 10;
+            const expressionCounts = {};
+            
+            detectionInterval = setInterval(async () => {
+                try {
+                    const detections = await faceapi.detectAllFaces(
+                        elements.video, 
+                        new faceapi.TinyFaceDetectorOptions()
+                    ).withFaceExpressions();
+                    
+                    if (detections.length > 0) {
+                        // Get the dominant expression
+                        const expressions = detections[0].expressions;
+                        let dominantExpression = '';
+                        let maxConfidence = 0;
+                        
+                        for (const [expression, confidence] of Object.entries(expressions)) {
+                            if (confidence > maxConfidence) {
+                                maxConfidence = confidence;
+                                dominantExpression = expression;
+                            }
+                        }
+                        
+                        // Map to our emotion categories
+                        const mappedEmotion = expressionMapping[dominantExpression] || 'Joy';
+                        
+                        // Count occurrences
+                        expressionCounts[mappedEmotion] = (expressionCounts[mappedEmotion] || 0) + 1;
+                    }
+                    
+                    detectionCount++;
+                    
+                    if (detectionCount >= maxDetections) {
+                        clearInterval(detectionInterval);
+                        
+                        // Find the most frequent emotion
+                        let mostFrequentEmotion = 'Joy';
+                        let maxCount = 0;
+                        
+                        for (const [emotion, count] of Object.entries(expressionCounts)) {
+                            if (count > maxCount) {
+                                maxCount = count;
+                                mostFrequentEmotion = emotion;
+                            }
+                        }
+                        
+                        const detectedImageSrc = emotionImagesMap[mostFrequentEmotion];
+                        
+                        elements.expressionMessage.innerHTML = `Detected Expression: <img src="${detectedImageSrc}" alt="${mostFrequentEmotion}" style="width: 40px; height: 40px; border-radius: 50%; vertical-align: middle;"> ${mostFrequentEmotion}`;
+                        lastDetectedEmotion = mostFrequentEmotion;
+                        askUserWithVoice(mostFrequentEmotion);
+                        askUser(mostFrequentEmotion);
+                        stopVideoStream();
+                        isDetecting = false;
+                    }
+                } catch (error) {
+                    console.error('Error during face detection:', error);
+                    clearInterval(detectionInterval);
+                    fallbackRandomDetection();
+                }
+            }, 300);
+        }
+        
+        // Fallback to random detection if AI detection fails
+        function fallbackRandomDetection() {
+            console.log('Using fallback random detection');
             setTimeout(() => {
                 const expressions = ["Joy", "Sad", "Angry", "Disgusted", "Fear"];
                 const randomExpression = expressions[Math.floor(Math.random() * expressions.length)];
